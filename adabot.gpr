@@ -1,0 +1,12 @@
+Project Adabot is
+
+  for Source_Dirs use ("src/**");
+  for Object_Dir  use "build";
+  for Exec_Dir    use ".";
+  for Main        use ("main.adb");
+
+  package Builder is
+     for Executable ("main.adb") use "adabot";
+  end Builder;
+
+end Adabot;
