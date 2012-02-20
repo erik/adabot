@@ -22,7 +22,7 @@ procedure Main is
 
 begin
 
-   Bot := Adabot.Bot.Create("irc.tenthbit.net", 6667);
+   Bot := Adabot.Bot.Create ("irc.tenthbit.net", 6667);
 
    Commands.Install_Commands (Bot);
 
@@ -31,10 +31,10 @@ begin
    Bot.Identify;
 
    loop
-      Buffer := SU.To_Unbounded_String("");
-      Bot.Read_Line(Buffer);
+      Buffer := SU.To_Unbounded_String ("");
+      Bot.Read_Line (Buffer);
 
-      exit when SU.Length(Buffer) <= 1;
+      exit when SU.Length (Buffer) <= 1;
 
       begin
          Msg := Message.Parse_Line (SU.To_String (Buffer));
@@ -44,9 +44,6 @@ begin
          when Message.Parse_Error =>
             Put_Line ("Failed to parse line: " & SU.To_String (Buffer));
       end;
-
-      Msg.Print;
-
    end loop;
 
    Bot.Disconnect;

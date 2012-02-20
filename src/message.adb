@@ -7,8 +7,10 @@ package body Message is
 
       package SF renames Ada.Strings.Fixed;
 
+      procedure Read_Word;
+
       procedure Read_Word is
-         Next_Ws : Natural := SF.Index (Line, " ", Index);
+         Next_WS : Natural := SF.Index (Line, " ", Index);
       begin
          Start := Index;
 
@@ -16,8 +18,8 @@ package body Message is
             raise Parse_Error;
          end if;
 
-         Finish := Next_Ws - 1;
-         Index := Next_Ws + 1;
+         Finish := Next_WS - 1;
+         Index := Next_WS + 1;
       end Read_Word;
 
    begin
@@ -45,6 +47,10 @@ package body Message is
       Msg.Args    := SU.To_Unbounded_String
         (Line (Finish + 2 .. Line'Last));
 
+      if Msg.Command = "PRIVMSG" then
+         Msg.Parse_Privmsg;
+      end if;
+
       return Msg;
    end Parse_Line;
 
@@ -52,8 +58,28 @@ package body Message is
       use Ada.Text_IO;
    begin
       Ada.Text_IO.Put_Line
-        (SU.To_String (This.Sender & "» " & This.Command & " " & This.Args));
+        (SU.To_String
+           (This.Sender & "» " & This.Command & " " & This.Args));
    end Print;
+
+
+   procedure Parse_Privmsg (Msg : in out Message) is
+
+      Args   : String
+        := SU.To_String (Msg.Args);
+
+      Target : String
+        := Args (Args'First .. SF.Index (Args, " ", Args'First) - 1);
+
+      Content : String
+        := Args (SF.Index (Args, ":", Args'First) ..  Args'Last);
+
+   begin
+
+      Msg.Privmsg.Target  := SU.To_Unbounded_String (Target);
+      Msg.Privmsg.Content := SU.To_Unbounded_String (Content);
+
+   end Parse_Privmsg;
 
 end Message;
 

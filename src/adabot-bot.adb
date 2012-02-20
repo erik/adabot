@@ -7,7 +7,7 @@ package body Adabot.Bot is
 
       use GNAT.Sockets;
       C : Connection;
-      NickUB : SU.Unbounded_String := SU.To_Unbounded_String(Nick);
+      NickUB : SU.Unbounded_String := SU.To_Unbounded_String (Nick);
 
       Privmsg_Access : Command_Proc := Privmsg_Command_Hook'Access;
    begin
@@ -16,7 +16,7 @@ package body Adabot.Bot is
       C.Address.Port := Port;
       C.Nick.Nick    := NickUB;
 
-      C.Add_Command ("PRIVMSG", Privmsg_Access);
+      C.On_Message ("PRIVMSG", Privmsg_Access);
       return C;
 
    end Create;
@@ -49,8 +49,8 @@ package body Adabot.Bot is
    end Disconnect;
 
    procedure Identify (This : Connection) is
-      User : String := SU.To_String ( This.Nick.Nick & " * * :" &
-                                        This.Nick.Realname);
+      User : String := SU.To_String
+        (This.Nick.Nick & " * * :" & This.Nick.Realname);
    begin
       This.Command (Cmd => "NICK", Args => SU.To_String (This.Nick.Nick));
       This.Command (Cmd => "USER", Args => User);
@@ -77,7 +77,7 @@ package body Adabot.Bot is
    procedure Send_Line (This : Connection;
                         Line : String) is
    begin
-      This.Send_Raw(Line & CRLF);
+      This.Send_Raw (Line & CRLF);
    end Send_Line;
 
    procedure Send_Raw (This : Connection;
@@ -89,7 +89,6 @@ package body Adabot.Bot is
    begin
       This.Should_Be_Connected;
 
-      -- ignore the \r\n
       Ada.Text_IO.Put_Line ("« " & Raw (Raw'First .. Raw'Last - 2));
 
       Channel := Stream (This.Sock);
@@ -113,32 +112,33 @@ package body Adabot.Bot is
       Channel := Stream (This.Sock);
 
       loop
-         Ada.Streams.Read(Channel.all, Data (1 .. 1), Offset);
+         Ada.Streams.Read (Channel.all, Data (1 .. 1), Offset);
 
          exit when Character'Val (Data (1)) = ASCII.LF;
 
          if Character'Val (Data (1)) /= ASCII.CR then
-            SU.Append (Source => Buffer, New_Item => (Character'Val (Data (1))));
+            SU.Append (Source => Buffer,
+                       New_Item => (Character'Val (Data (1))));
          end if;
 
       end loop;
 
    end Read_Line;
 
-   procedure Add_Command (This  : in out Connection;
-                          OnMsg : String;
-                          Func  : Command_Proc) is
+   procedure On_Message (This  : in out Connection;
+                         OnMsg : String;
+                         Func  : Command_Proc) is
 
       Regex : Regexp.Pattern_Matcher (1024);
    begin
       Regexp.Compile (Regex, "^" & Regexp.Quote (OnMsg) & "$");
 
       This.Commands.Append (Command_Pair'(Func, Regex));
-   end Add_Command;
+   end On_Message;
 
-   procedure Add_Command_Regexp (This     : in out Connection;
-                                 OnRegexp : Regexp.Pattern_Matcher;
-                                 Func     : Command_Proc) is
+   procedure On_Regexp (This     : in out Connection;
+                        OnRegexp : Regexp.Pattern_Matcher;
+                        Func     : Command_Proc) is
 
       Cmd : Command_Pair;
    begin
@@ -146,17 +146,17 @@ package body Adabot.Bot is
       Cmd.Func := Func;
 
       This.Commands.Append (Cmd);
-   end Add_Command_Regexp;
+   end On_Regexp;
 
-   procedure Add_Privmsg_Command (This  : in out Connection;
-                                  OnMsg : String;
-                                  Func  : Command_Proc) is
+   procedure On_Privmsg (This  : in out Connection;
+                         OnMsg : String;
+                         Func  : Command_Proc) is
       Regex : Regexp.Pattern_Matcher (1024);
    begin
       Regexp.Compile (Regex, "^" & Regexp.Quote (OnMsg));
 
       This.Privmsg_Commands.Append (Command_Pair'(Func, Regex));
-   end Add_Privmsg_Command;
+   end On_Privmsg;
 
    procedure Do_Message (This : in out Connection;
                          Msg  : Message.Message) is
@@ -178,7 +178,9 @@ package body Adabot.Bot is
 
    end Do_Message;
 
-   -- private functions / procedures
+   ---------------------------
+   --  Private declarations --
+   ---------------------------
 
    procedure Should_Be_Connected (This : Connection) is
    begin
@@ -198,7 +200,9 @@ package body Adabot.Bot is
       Matches : Regexp.Match_Array (0 .. 1);
       Str : String := SU.To_String (Msg.Args);
    begin
-      for I in This.Privmsg_Commands.First_Index .. This.Privmsg_Commands.Last_Index loop
+      for I in This.Privmsg_Commands.First_Index ..
+        This.Privmsg_Commands.Last_Index loop
+
          Pair := This.Privmsg_Commands.Element (Index => I);
 
          Regexp.Match (Pair.Regex,

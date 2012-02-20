@@ -5,6 +5,15 @@ Project Adabot is
   for Exec_Dir    use ".";
   for Main        use ("main.adb");
 
+  package Compiler is
+     for Default_Switches ("ada") use
+       (
+        "-gnat05",
+         "-gnatVa",
+         "-gnatyy"
+       );
+  end Compiler;
+
   package Builder is
      for Executable ("main.adb") use "adabot";
   end Builder;

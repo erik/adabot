@@ -55,27 +55,32 @@ package Adabot.Bot is
    procedure Read_Line (This   :     Connection;
                         Buffer : out SU.Unbounded_String);
 
-   procedure Add_Command (This  : in out Connection;
-                          OnMsg : String;
-                          Func  : Command_Proc);
+   procedure On_Message (This  : in out Connection;
+                         OnMsg : String;
+                         Func  : Command_Proc);
 
-   procedure Add_Command_Regexp (This     : in out Connection;
-                                 OnRegexp : Regexp.Pattern_Matcher;
-                                 Func     : Command_Proc);
+   procedure On_Regexp (This     : in out Connection;
+                        OnRegexp : Regexp.Pattern_Matcher;
+                        Func     : Command_Proc);
 
-   procedure Add_Privmsg_Command (This  : in out Connection;
-                                  OnMsg : String;
-                                  Func  : Command_Proc);
+   procedure On_Privmsg (This  : in out Connection;
+                         OnMsg : String;
+                         Func  : Command_Proc);
 
    procedure Do_Message (This : in out Connection;
                          Msg  : Message.Message);
+
+   ---------------------------
+   --  Private declarations --
+   ---------------------------
 
 private
 
    Socket_Read_Error : exception;
    Not_Connected     : exception;
 
-   CRLF : constant String := Ada.Characters.Latin_1.CR & Ada.Characters.Latin_1.LF;
+   CRLF : constant String :=
+     Ada.Characters.Latin_1.CR & Ada.Characters.Latin_1.LF;
 
    type Command_Pair is record
       Func  : Command_Proc;
@@ -86,8 +91,8 @@ private
 
    type Nick_Attributes is
       record
-         Nick      : SU.Unbounded_String := SU.To_Unbounded_String("adabot");
-         Realname  : SU.Unbounded_String := SU.To_Unbounded_String("adabot");
+         Nick      : SU.Unbounded_String := SU.To_Unbounded_String ("adabot");
+         Realname  : SU.Unbounded_String := SU.To_Unbounded_String ("adabot");
          Password  : SU.Unbounded_String;
       end record;
 
@@ -100,9 +105,12 @@ private
       Privmsg_Commands  : Command_Vector.Vector;
    end record;
 
-   -- raises Not_Connected unless the connection is active
+   --  Provides a simple runtime check to guarantee that the
+   --  given Connection is active before trying to send / receive.
+   --  raises Not_Connected unless the connection is active.
    procedure Should_Be_Connected (This : Connection);
 
-   procedure Privmsg_Command_Hook (This : Connection; Msg : Message.Message);
+   procedure Privmsg_Command_Hook (This : Connection;
+                                   Msg  : Message.Message);
 
 end Adabot.Bot;
