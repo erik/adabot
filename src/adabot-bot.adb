@@ -21,6 +21,17 @@ package body Adabot.Bot is
 
    end Create;
 
+   function Get_Attributes (Conn : in Connection) return Nick_Attributes is
+   begin
+      return Conn.Nick;
+   end Get_Attributes;
+
+   procedure Set_Attributes (Conn : in out Connection;
+                             Nick :        Nick_Attributes) is
+   begin
+      Conn.Nick := Nick;
+   end Set_Attributes;
+
    procedure Connect (Conn : in out Connection) is
       use GNAT.Sockets;
    begin
@@ -126,8 +137,8 @@ package body Adabot.Bot is
    end Read_Line;
 
    procedure On_Message (This  : in out Connection;
-                         OnMsg : String;
-                         Func  : Command_Proc) is
+                         OnMsg :        String;
+                         Func  :        Command_Proc) is
 
       Regex : Regexp.Pattern_Matcher (1024);
    begin
@@ -137,8 +148,8 @@ package body Adabot.Bot is
    end On_Message;
 
    procedure On_Regexp (This     : in out Connection;
-                        OnRegexp : Regexp.Pattern_Matcher;
-                        Func     : Command_Proc) is
+                        OnRegexp :        Regexp.Pattern_Matcher;
+                        Func     :        Command_Proc) is
 
       Cmd : Command_Pair;
    begin
@@ -148,9 +159,19 @@ package body Adabot.Bot is
       This.Commands.Append (Cmd);
    end On_Regexp;
 
+   procedure On_Regexp (This     : in out Connection;
+                        OnRegexp :        String;
+                        Func     :        Command_Proc) is
+      Regex : Regexp.Pattern_Matcher (1024);
+   begin
+      Regexp.Compile (Regex, OnRegexp);
+
+      This.Commands.Append (Command_Pair'(Func, Regex));
+   end On_Regexp;
+
    procedure On_Privmsg (This  : in out Connection;
-                         OnMsg : String;
-                         Func  : Command_Proc) is
+                         OnMsg :        String;
+                         Func  :        Command_Proc) is
       Regex : Regexp.Pattern_Matcher (1024);
    begin
       Regexp.Compile (Regex, "^" & Regexp.Quote (OnMsg));
@@ -159,7 +180,7 @@ package body Adabot.Bot is
    end On_Privmsg;
 
    procedure Do_Message (This : in out Connection;
-                         Msg  : Message.Message) is
+                         Msg  :        Message.Message) is
       use Regexp;
 
       Pair : Command_Pair;
@@ -192,7 +213,8 @@ package body Adabot.Bot is
 
    end Should_Be_Connected;
 
-   procedure Privmsg_Command_Hook (This : Connection; Msg : Message.Message) is
+   procedure Privmsg_Command_Hook (This : in out Connection;
+                                   Msg  :        Message.Message) is
       use Regexp;
       use SF;
 

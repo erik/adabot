@@ -24,13 +24,28 @@ package Adabot.Bot is
    use type SU.Unbounded_String;
 
    type Connection is tagged private;
-   type Command_Proc is access procedure (Conn : Connection;
-                                          Msg  : Message.Message);
+
+   type Nick_Attributes is record
+      Nick      : SU.Unbounded_String
+        := SU.To_Unbounded_String ("adabot");
+      Realname  : SU.Unbounded_String
+        := SU.To_Unbounded_String ("adabot");
+      Password  : SU.Unbounded_String;
+   end record;
+
+   type Command_Proc is access procedure (Conn : in out Connection;
+                                          Msg  :        Message.Message);
 
    function Create (Server : String;
                     Port   : GNAT.Sockets.Port_Type;
                     Nick   : String                 := "adabot")
                    return Connection;
+
+   function Get_Attributes (Conn : in Connection) return Nick_Attributes;
+   pragma Inline (Get_Attributes);
+
+   procedure Set_Attributes (Conn : in out Connection;
+                             Nick :        Nick_Attributes);
 
    procedure Connect (Conn : in out Connection);
    procedure Disconnect (Conn : in out Connection);
@@ -56,19 +71,23 @@ package Adabot.Bot is
                         Buffer : out SU.Unbounded_String);
 
    procedure On_Message (This  : in out Connection;
-                         OnMsg : String;
-                         Func  : Command_Proc);
+                         OnMsg :        String;
+                         Func  :        Command_Proc);
 
    procedure On_Regexp (This     : in out Connection;
-                        OnRegexp : Regexp.Pattern_Matcher;
-                        Func     : Command_Proc);
+                        OnRegexp :        String;
+                        Func     :        Command_Proc);
+
+   procedure On_Regexp (This     : in out Connection;
+                        OnRegexp :        Regexp.Pattern_Matcher;
+                        Func     :        Command_Proc);
 
    procedure On_Privmsg (This  : in out Connection;
-                         OnMsg : String;
-                         Func  : Command_Proc);
+                         OnMsg :        String;
+                         Func  :        Command_Proc);
 
    procedure Do_Message (This : in out Connection;
-                         Msg  : Message.Message);
+                         Msg  :        Message.Message);
 
    ---------------------------
    --  Private declarations --
@@ -82,19 +101,20 @@ private
    CRLF : constant String :=
      Ada.Characters.Latin_1.CR & Ada.Characters.Latin_1.LF;
 
+   --  Provides a simple runtime check to guarantee that the
+   --  given Connection is active before trying to send / receive.
+   --  raises Not_Connected unless the connection is active.
+   procedure Should_Be_Connected (This : Connection);
+
+   procedure Privmsg_Command_Hook (This : in out Connection;
+                                   Msg  :        Message.Message);
+
    type Command_Pair is record
       Func  : Command_Proc;
       Regex : Regexp.Pattern_Matcher (1024);
    end record;
 
    package Command_Vector is new Vectors (Natural, Command_Pair);
-
-   type Nick_Attributes is
-      record
-         Nick      : SU.Unbounded_String := SU.To_Unbounded_String ("adabot");
-         Realname  : SU.Unbounded_String := SU.To_Unbounded_String ("adabot");
-         Password  : SU.Unbounded_String;
-      end record;
 
    type Connection is tagged record
       Sock      : GNAT.Sockets.Socket_Type;
@@ -104,13 +124,5 @@ private
       Commands  : Command_Vector.Vector;
       Privmsg_Commands  : Command_Vector.Vector;
    end record;
-
-   --  Provides a simple runtime check to guarantee that the
-   --  given Connection is active before trying to send / receive.
-   --  raises Not_Connected unless the connection is active.
-   procedure Should_Be_Connected (This : Connection);
-
-   procedure Privmsg_Command_Hook (This : Connection;
-                                   Msg  : Message.Message);
 
 end Adabot.Bot;

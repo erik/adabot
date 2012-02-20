@@ -17,15 +17,17 @@ package Commands is
    procedure Install_Commands (Conn : in out Bot);
 
    --  General commands.
-   procedure Join_On_Ident (Conn : Bot;
-                            Msg  : IrcMessage);
-   procedure Ping_Pong (Conn : Bot;
-                        Msg  : IrcMessage);
-   procedure Log_Line (Conn : Bot;
-                       Msg  : IrcMessage);
+   procedure Join_On_Ident (Conn : in out Bot;
+                            Msg  :        IrcMessage);
+   procedure Nick_In_Use   (Conn : in out Bot;
+                            Msg  :        IrcMessage);
+   procedure Ping_Pong     (Conn : in out Bot;
+                            Msg  :        IrcMessage);
+   procedure Log_Line      (Conn : in out Bot;
+                            Msg  :        IrcMessage);
 
    --  PRIVMSG commands.
-   procedure Join_Channel (Conn : Bot;
+   procedure Join_Channel (Conn : in out Bot;
                            Msg  : IrcMessage);
 
 end Commands;
