@@ -12,7 +12,7 @@ private with Ada.Streams;
 private with Ada.Characters.Latin_1;
 private with Ada.Characters.Handling;
 
-package Adabot.Bot is
+package Bot is
    package SU renames Ada.Strings.Unbounded;
    package SF renames Ada.Strings.Fixed;
 
@@ -125,4 +125,4 @@ private
       Privmsg_Commands  : Command_Vector.Vector;
    end record;
 
-end Adabot.Bot;
+end Bot;

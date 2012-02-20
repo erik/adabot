@@ -3,7 +3,7 @@ with Ada.Strings.Fixed;
 with GNAT.String_Split;
 with GNAT.Regpat;
 
-with Adabot.Bot;
+with Bot;
 with Message;
 
 package Commands is
@@ -11,23 +11,23 @@ package Commands is
    package SF renames Ada.Strings.Fixed;
    package Regexp renames GNAT.Regpat;
 
-   subtype Bot is Adabot.Bot.Connection;
+   subtype Connection is Bot.Connection;
    subtype IrcMessage is Message.Message;
 
-   procedure Install_Commands (Conn : in out Bot);
+   procedure Install_Commands (Conn : in out Connection);
 
    --  General commands.
-   procedure Join_On_Ident (Conn : in out Bot;
+   procedure Join_On_Ident (Conn : in out Connection;
                             Msg  :        IrcMessage);
-   procedure Nick_In_Use   (Conn : in out Bot;
+   procedure Nick_In_Use   (Conn : in out Connection;
                             Msg  :        IrcMessage);
-   procedure Ping_Pong     (Conn : in out Bot;
+   procedure Ping_Pong     (Conn : in out Connection;
                             Msg  :        IrcMessage);
-   procedure Log_Line      (Conn : in out Bot;
+   procedure Log_Line      (Conn : in out Connection;
                             Msg  :        IrcMessage);
 
    --  PRIVMSG commands.
-   procedure Join_Channel (Conn : in out Bot;
+   procedure Join_Channel (Conn : in out Connection;
                            Msg  : IrcMessage);
 
 end Commands;

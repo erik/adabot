@@ -1,6 +1,6 @@
 package body Commands is
 
-   procedure Install_Commands (Conn : in out Bot) is
+   procedure Install_Commands (Conn : in out Connection) is
    begin
       --  general commands
       Conn.On_Message ("001",      Join_On_Ident'Access);
@@ -17,18 +17,18 @@ package body Commands is
    -- Begin general commands --
    ----------------------------
 
-   procedure Join_On_Ident (Conn : in out Bot;
+   procedure Join_On_Ident (Conn : in out Connection;
                             Msg  :        IrcMessage) is
    begin
       Conn.Join ("#bots");
       Conn.Privmsg ("#bots", "testin'");
    end Join_On_Ident;
 
-   procedure Nick_In_Use (Conn : in out Bot;
+   procedure Nick_In_Use (Conn : in out Connection;
                           Msg  :        IrcMessage) is
       use SU;
 
-      Attr     : Adabot.Bot.Nick_Attributes := Conn.Get_Attributes;
+      Attr     : Bot.Nick_Attributes := Conn.Get_Attributes;
       New_Nick : SU.Unbounded_String := Attr.Nick & "_";
    begin
       Attr.Nick := New_Nick;
@@ -37,13 +37,13 @@ package body Commands is
       Conn.Set_Attributes (Attr);
    end Nick_In_Use;
 
-   procedure Ping_Pong (Conn : in out Bot;
+   procedure Ping_Pong (Conn : in out Connection;
                         Msg  :        Message.Message) is
    begin
       Conn.Command (Cmd => "PONG", Args => SU.To_String (Msg.Args));
    end Ping_Pong;
 
-   procedure Log_Line (Conn : in out Bot;
+   procedure Log_Line (Conn : in out Connection;
                        Msg  :        IrcMessage) is
    begin
       Msg.Print;
@@ -53,7 +53,7 @@ package body Commands is
    -- Begin PRIVMSG commands --
    ----------------------------
 
-   procedure Join_Channel (Conn : in out Bot;
+   procedure Join_Channel (Conn : in out Connection;
                            Msg  :        IrcMessage) is
       Content : String := SU.To_String (Msg.Privmsg.Content);
 

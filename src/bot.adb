@@ -1,4 +1,4 @@
-package body Adabot.Bot is
+package body Bot is
 
    function Create (Server : String;
                     Port   : GNAT.Sockets.Port_Type;
@@ -238,4 +238,4 @@ package body Adabot.Bot is
       end loop;
    end Privmsg_Command_Hook;
 
-end Adabot.Bot;
+end Bot;
