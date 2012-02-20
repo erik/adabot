@@ -21,6 +21,6 @@ package Message is
    -- give a nicer representation of the message
    procedure Print (This : Message);
 
-   Message_Parse_Error : exception;
+   Parse_Error : exception;
 
 end Message;

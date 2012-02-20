@@ -12,8 +12,8 @@ package body Message is
       begin
          Start := Index;
 
-         if Next_WS >= Line'Last then
-            raise Message_Parse_Error;
+         if Next_WS > Line'Last then
+            raise Parse_Error;
          end if;
 
          Finish := Next_Ws - 1;
@@ -23,7 +23,17 @@ package body Message is
    begin
 
       if Line (Line'First) /= ':' then
-         raise Message_Parse_Error;
+
+         if SF.Index (Line, "PING", Line'First) = Line'First then
+            Msg.Sender := SU.To_Unbounded_String ("<server>");
+            Msg.Command := SU.To_Unbounded_String ("PING");
+            Msg.Args := SU.To_Unbounded_String
+              (Line (Line'First + 6 .. Line'Last));
+
+            return Msg;
+         end if;
+
+         raise Parse_Error;
       end if;
 
       Read_Word;
