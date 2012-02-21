@@ -1,5 +1,6 @@
 *.o
 *.ali
 adabot
-build/
-main
+
+build/*
+!build/.gitignore
