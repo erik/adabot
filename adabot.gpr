@@ -10,7 +10,9 @@ Project Adabot is
        (
         "-gnat05",
         "-gnatVa",
-        "-gnatyy"
+        "-gnatyy",
+	"-gnatE",
+	"-gnatf"
        );
   end Compiler;
 

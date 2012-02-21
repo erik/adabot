@@ -85,6 +85,11 @@ package Bot is
    procedure Do_Message (This : in out Connection;
                          Msg  :        Message.Message);
 
+   function Is_Admin (Conn   : in Connection;
+                      Sender :    SU.Unbounded_String)
+                     return Boolean;
+
+
    -----------------------------------------------
    -- Attribute accessors procedures/functions  --
    -----------------------------------------------

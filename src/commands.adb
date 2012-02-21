@@ -69,7 +69,7 @@ package body Commands is
                      SU.Length (Msg.Privmsg.Content));
    begin
 
-      if Is_Admin (Conn, Msg.Sender) then
+      if Conn.Is_Admin (Msg.Sender) then
          Conn.Privmsg (Channel, "yeah, sure");
          Conn.Join (Target);
       else
@@ -88,7 +88,7 @@ package body Commands is
                      SU.Length (Msg.Privmsg.Content));
    begin
 
-      if Is_Admin (Conn, Msg.Sender) then
+      if Conn.Is_Admin (Msg.Sender) then
          Conn.Privmsg (Channel, "yeah, sure");
          Conn.Command (Cmd => "PART", Args => Target);
       else
@@ -105,35 +105,5 @@ package body Commands is
    begin
       Conn.Privmsg (SU.To_String (Msg.Privmsg.Target), Nick & ": pong");
    end Ping_Pong;
-
-   ------------------------------
-   -- Begin private functions  --
-   ------------------------------
-
-   --  XXX: This function would probably fit better in with the Bot package
-   function Is_Admin (Conn   : in Connection;
-                      Sender :    SU.Unbounded_String)
-                     return Boolean is
-      use SU;
-
-      Admins : Bot.Unbounded_Vector.Vector
-        := Conn.Get_Administrators;
-
-      Admin : SU.Unbounded_String;
-
-   begin
-      for I in Admins.First_Index .. Admins.Last_Index loop
-         Admin := Admins.Element (I);
-
-         Ada.Text_IO.Put_Line (SU.To_String (Admin & " with " & Sender));
-
-         if SU.Index (Sender, SU.To_String (Admin)) = 1 then
-            return True;
-         end if;
-      end loop;
-
-      return False;
-   end Is_Admin;
-
 
 end Commands;

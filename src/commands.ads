@@ -37,9 +37,4 @@ package Commands is
    procedure Ping_Pong    (Conn : in out Connection;
                            Msg  :        IrcMessage);
 
-private
-
-   function Is_Admin (Conn   : in Connection;
-                      Sender :    SU.Unbounded_String) return Boolean;
-
 end Commands;
