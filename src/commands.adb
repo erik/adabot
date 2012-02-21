@@ -10,6 +10,7 @@ package body Commands is
 
       --  PRIVMSG commands
       Conn.On_Privmsg ("$join ",   Join_Channel'Access);
+      Conn.On_Privmsg ("$part ",   Part_Channel'Access);
       Conn.On_Privmsg ("$ping",    Ping_Pong'Access);
    end Install_Commands;
 
@@ -19,9 +20,12 @@ package body Commands is
 
    procedure Join_On_Ident (Conn : in out Connection;
                             Msg  :        IrcMessage) is
+      Channels : Bot.Unbounded_Vector.Vector
+        := Conn.Get_Default_Channels;
    begin
-      Conn.Join ("#bots");
-      Conn.Privmsg ("#bots", "testin'");
+      for I in Channels.First_Index .. Channels.Last_Index loop
+         Conn.Join (SU.To_String (Channels.Element (I)));
+      end loop;
    end Join_On_Ident;
 
    procedure Nick_In_Use (Conn : in out Connection;
@@ -65,13 +69,32 @@ package body Commands is
                      SU.Length (Msg.Privmsg.Content));
    begin
 
-      if SU.Index (Msg.Sender, "boredomist!") /= 1 then
-         Conn.Privmsg (Channel, "absolutely not.");
-      else
+      if Is_Admin (Conn, Msg.Sender) then
          Conn.Privmsg (Channel, "yeah, sure");
          Conn.Join (Target);
+      else
+         Conn.Privmsg (Channel, "absolutely not.");
       end if;
    end Join_Channel;
+
+   procedure Part_Channel (Conn : in out Connection;
+                           Msg  :        IrcMessage) is
+      Channel : String
+        := SU.To_String (Msg.Privmsg.Target);
+
+      Target : String
+        := SU.Slice (Msg.Privmsg.Content,
+                     SU.Index (Msg.Privmsg.Content, " "),
+                     SU.Length (Msg.Privmsg.Content));
+   begin
+
+      if Is_Admin (Conn, Msg.Sender) then
+         Conn.Privmsg (Channel, "yeah, sure");
+         Conn.Command (Cmd => "PART", Args => Target);
+      else
+         Conn.Privmsg (Channel, "absolutely not.");
+      end if;
+   end Part_Channel;
 
    procedure Ping_Pong (Conn : in out Connection;
                         Msg  :        IrcMessage) is
@@ -82,5 +105,35 @@ package body Commands is
    begin
       Conn.Privmsg (SU.To_String (Msg.Privmsg.Target), Nick & ": pong");
    end Ping_Pong;
+
+   ------------------------------
+   -- Begin private functions  --
+   ------------------------------
+
+   --  XXX: This function would probably fit better in with the Bot package
+   function Is_Admin (Conn   : in Connection;
+                      Sender :    SU.Unbounded_String)
+                     return Boolean is
+      use SU;
+
+      Admins : Bot.Unbounded_Vector.Vector
+        := Conn.Get_Administrators;
+
+      Admin : SU.Unbounded_String;
+
+   begin
+      for I in Admins.First_Index .. Admins.Last_Index loop
+         Admin := Admins.Element (I);
+
+         Ada.Text_IO.Put_Line (SU.To_String (Admin & " with " & Sender));
+
+         if SU.Index (Sender, SU.To_String (Admin)) = 1 then
+            return True;
+         end if;
+      end loop;
+
+      return False;
+   end Is_Admin;
+
 
 end Commands;

@@ -25,6 +25,8 @@ package Bot is
 
    type Connection is tagged private;
 
+   package Unbounded_Vector is new Vectors (Natural, SU.Unbounded_String);
+
    type Nick_Attributes is record
       Nick      : SU.Unbounded_String
         := SU.To_Unbounded_String ("adabot");
@@ -40,12 +42,6 @@ package Bot is
                     Port   : GNAT.Sockets.Port_Type;
                     Nick   : String                 := "adabot")
                    return Connection;
-
-   function Get_Attributes (Conn : in Connection) return Nick_Attributes;
-   pragma Inline (Get_Attributes);
-
-   procedure Set_Attributes (Conn : in out Connection;
-                             Nick :        Nick_Attributes);
 
    procedure Connect (Conn : in out Connection);
    procedure Disconnect (Conn : in out Connection);
@@ -89,6 +85,31 @@ package Bot is
    procedure Do_Message (This : in out Connection;
                          Msg  :        Message.Message);
 
+   -----------------------------------------------
+   -- Attribute accessors procedures/functions  --
+   -----------------------------------------------
+
+   function Get_Attributes (Conn : in Connection) return Nick_Attributes;
+   pragma Inline (Get_Attributes);
+
+   procedure Set_Attributes (Conn : in out Connection;
+                             Nick :        Nick_Attributes);
+
+   function Get_Administrators (Conn : in Connection)
+                               return Unbounded_Vector.Vector;
+   function Get_Default_Channels (Conn : in Connection)
+                                 return Unbounded_Vector.Vector;
+
+   procedure Add_Administrator (Conn  : in out Connection;
+                                Admin :        String);
+   procedure Add_Administrator (Conn  : in out Connection;
+                                Admin :        SU.Unbounded_String);
+
+   procedure Add_Default_Channel (Conn    : in out Connection;
+                                  Channel :        String);
+   procedure Add_Default_Channel (Conn    : in out Connection;
+                                  Channel :        SU.Unbounded_String);
+
    ---------------------------
    --  Private declarations --
    ---------------------------
@@ -123,6 +144,9 @@ private
       Nick      : Nick_Attributes;
       Commands  : Command_Vector.Vector;
       Privmsg_Commands  : Command_Vector.Vector;
+
+      Administrators   : Unbounded_Vector.Vector;
+      Default_Channels : Unbounded_Vector.Vector;
    end record;
 
 end Bot;

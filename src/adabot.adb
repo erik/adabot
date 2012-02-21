@@ -24,10 +24,12 @@ begin
 
    Conn := Bot.Create ("irc.tenthbit.net", 6667);
 
+   Conn.Add_Administrator ("boredomist!");
+   Conn.Add_Default_Channel ("#bots");
+   Conn.Add_Default_Channel ("#asdf");
+
    Commands.Install_Commands (Conn);
-
    Conn.Connect;
-
    Conn.Identify;
 
    loop

@@ -21,17 +21,6 @@ package body Bot is
 
    end Create;
 
-   function Get_Attributes (Conn : in Connection) return Nick_Attributes is
-   begin
-      return Conn.Nick;
-   end Get_Attributes;
-
-   procedure Set_Attributes (Conn : in out Connection;
-                             Nick :        Nick_Attributes) is
-   begin
-      Conn.Nick := Nick;
-   end Set_Attributes;
-
    procedure Connect (Conn : in out Connection) is
       use GNAT.Sockets;
    begin
@@ -198,6 +187,58 @@ package body Bot is
       end loop;
 
    end Do_Message;
+
+   -----------------------------------------------
+   -- Attribute accessors procedures/functions  --
+   -----------------------------------------------
+
+   function Get_Attributes (Conn : in Connection) return Nick_Attributes is
+   begin
+      return Conn.Nick;
+   end Get_Attributes;
+
+   procedure Set_Attributes (Conn : in out Connection;
+                             Nick :        Nick_Attributes) is
+   begin
+      Conn.Nick := Nick;
+   end Set_Attributes;
+
+   function Get_Administrators (Conn : in Connection)
+                               return Unbounded_Vector.Vector is
+   begin
+      return Conn.Administrators;
+   end Get_Administrators;
+
+   function Get_Default_Channels (Conn : in Connection)
+                                 return Unbounded_Vector.Vector is
+   begin
+      return Conn.Default_Channels;
+   end Get_Default_Channels;
+
+   procedure Add_Administrator (Conn  : in out Connection;
+                                Admin :        String) is
+   begin
+      Conn.Administrators.Append (SU.To_Unbounded_String (Admin));
+   end Add_Administrator;
+
+   procedure Add_Administrator (Conn  : in out Connection;
+                                Admin :        SU.Unbounded_String) is
+   begin
+      Conn.Administrators.Append (Admin);
+   end Add_Administrator;
+
+   procedure Add_Default_Channel (Conn  : in out Connection;
+                                  Channel :        String) is
+   begin
+      Conn.Default_Channels.Append (SU.To_Unbounded_String (Channel));
+   end Add_Default_Channel;
+
+   procedure Add_Default_Channel (Conn  : in out Connection;
+                                  Channel :        SU.Unbounded_String) is
+   begin
+      Conn.Default_Channels.Append (Channel);
+   end Add_Default_Channel;
+
 
    ---------------------------
    --  Private declarations --

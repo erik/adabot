@@ -79,6 +79,12 @@ package body Message is
       Msg.Privmsg.Target  := SU.To_Unbounded_String (Target);
       Msg.Privmsg.Content := SU.To_Unbounded_String (Content);
 
+      --  not a channel message
+      if Target (Target'First) /= '#' then
+         Msg.Privmsg.Target := SU.To_Unbounded_String
+           (SU.Slice (Msg.Sender, 1, SU.Index (Msg.Sender, "!") - 1));
+      end if;
+
    end Parse_Privmsg;
 
 end Message;

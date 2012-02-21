@@ -1,5 +1,8 @@
 with Ada.Strings.Unbounded;
 with Ada.Strings.Fixed;
+with Ada.Text_IO;
+
+
 with GNAT.String_Split;
 with GNAT.Regpat;
 
@@ -29,7 +32,14 @@ package Commands is
    --  PRIVMSG commands.
    procedure Join_Channel (Conn : in out Connection;
                            Msg  :        IrcMessage);
+   procedure Part_Channel (Conn : in out Connection;
+                           Msg  :        IrcMessage);
    procedure Ping_Pong    (Conn : in out Connection;
                            Msg  :        IrcMessage);
+
+private
+
+   function Is_Admin (Conn   : in Connection;
+                      Sender :    SU.Unbounded_String) return Boolean;
 
 end Commands;
