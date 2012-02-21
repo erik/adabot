@@ -5,12 +5,12 @@ package body Commands is
       --  general commands
       Conn.On_Message ("001",      Join_On_Ident'Access);
       Conn.On_Message ("433",      Nick_In_Use'Access);
-      Conn.On_Message ("PING",     Ping_Pong'Access);
+      Conn.On_Message ("PING",     Ping_Server'Access);
       Conn.On_Regexp  (".*",       Log_Line'Access);
 
       --  PRIVMSG commands
-      Conn.On_Privmsg ("$join ", Join_Channel'Access);
-
+      Conn.On_Privmsg ("$join ",   Join_Channel'Access);
+      Conn.On_Privmsg ("$ping",    Ping_Pong'Access);
    end Install_Commands;
 
    ----------------------------
@@ -37,11 +37,11 @@ package body Commands is
       Conn.Set_Attributes (Attr);
    end Nick_In_Use;
 
-   procedure Ping_Pong (Conn : in out Connection;
-                        Msg  :        Message.Message) is
+   procedure Ping_Server (Conn : in out Connection;
+                          Msg  :        Message.Message) is
    begin
       Conn.Command (Cmd => "PONG", Args => SU.To_String (Msg.Args));
-   end Ping_Pong;
+   end Ping_Server;
 
    procedure Log_Line (Conn : in out Connection;
                        Msg  :        IrcMessage) is
@@ -55,24 +55,32 @@ package body Commands is
 
    procedure Join_Channel (Conn : in out Connection;
                            Msg  :        IrcMessage) is
-      Content : String := SU.To_String (Msg.Privmsg.Content);
 
       Channel : String
         := SU.To_String (Msg.Privmsg.Target);
 
-      Target  : String
-        := Content (SF.Index (Content, " ", Content'First) ..
-                      Content'Last);
-
-      Sender : String := SU.To_String (Msg.Sender);
+      Target : String
+        := SU.Slice (Msg.Privmsg.Content,
+                     SU.Index (Msg.Privmsg.Content, " "),
+                     SU.Length (Msg.Privmsg.Content));
    begin
 
-      if SF.Index (Sender, "boredomist!", Sender'First) /= Sender'First then
+      if SU.Index (Msg.Sender, "boredomist!") /= 1 then
          Conn.Privmsg (Channel, "absolutely not.");
       else
          Conn.Privmsg (Channel, "yeah, sure");
          Conn.Join (Target);
       end if;
    end Join_Channel;
+
+   procedure Ping_Pong (Conn : in out Connection;
+                        Msg  :        IrcMessage) is
+
+      Nick : String
+        := SU.Slice (Msg.Sender, 1, SU.Index (Msg.Sender, "!") - 1);
+
+   begin
+      Conn.Privmsg (SU.To_String (Msg.Privmsg.Target), Nick & ": pong");
+   end Ping_Pong;
 
 end Commands;

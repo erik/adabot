@@ -21,13 +21,15 @@ package Commands is
                             Msg  :        IrcMessage);
    procedure Nick_In_Use   (Conn : in out Connection;
                             Msg  :        IrcMessage);
-   procedure Ping_Pong     (Conn : in out Connection;
+   procedure Ping_Server   (Conn : in out Connection;
                             Msg  :        IrcMessage);
    procedure Log_Line      (Conn : in out Connection;
                             Msg  :        IrcMessage);
 
    --  PRIVMSG commands.
    procedure Join_Channel (Conn : in out Connection;
-                           Msg  : IrcMessage);
+                           Msg  :        IrcMessage);
+   procedure Ping_Pong    (Conn : in out Connection;
+                           Msg  :        IrcMessage);
 
 end Commands;

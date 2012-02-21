@@ -27,7 +27,7 @@ package body Message is
       if Line (Line'First) /= ':' then
 
          if SF.Index (Line, "PING", Line'First) = Line'First then
-            Msg.Sender := SU.To_Unbounded_String ("<server>");
+            Msg.Sender := SU.To_Unbounded_String ("");
             Msg.Command := SU.To_Unbounded_String ("PING");
             Msg.Args := SU.To_Unbounded_String
               (Line (Line'First + 6 .. Line'Last));
