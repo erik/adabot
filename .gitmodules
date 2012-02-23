@@ -1,0 +1,3 @@
+[submodule "ada-irc"]
+	path = ada-irc
+	url = git://github.com/boredomist/ada-irc.git

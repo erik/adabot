@@ -1,6 +1,6 @@
 PROJECT := adabot.gpr
 
-all:
+all: ada-irc
 	gnatmake -P $(PROJECT)
 
 clean:

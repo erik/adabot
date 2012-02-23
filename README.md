@@ -6,14 +6,8 @@ and a procedure access. See `src/commands.adb`.
 
 ## building
 
-Uses gnat make. Run `make`.
-
-## dependencies
-
-As of right now, adabot only requires some GNAT utilities, such as
-sockets, regexp, and some string manipulation. I'm using the GNU GNAT
-compiler, but there isn't really anything all that fancy or
-implementation specific going on here.
+Uses ada-irc library, run `git submodule update` to grab the latest
+git revision of it, then run `make` to build the bot with GNAT make.
 
 ## license
 (The MIT License)
